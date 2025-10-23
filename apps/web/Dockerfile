@@ -4,13 +4,8 @@ WORKDIR /app
 
 COPY package.json pnpm-workspace.yaml turbo.json tsconfig.base.json ./
 COPY apps/web/package.json apps/web/
-COPY apps/api/package.json apps/api/
-COPY apps/smtp/package.json apps/smtp/
-COPY apps/worker/package.json apps/worker/
-COPY packages/prisma/package.json packages/prisma/
-COPY packages/cli/package.json packages/cli/
 
-RUN pnpm install --filter @smtp-oauth2/web --filter @smtp-oauth2/api --filter @smtp-oauth2/smtp --filter @smtp-oauth2/worker --filter @smtp-oauth2/prisma --filter @smtp-oauth2/cli --recursive --shamefully-hoist
+RUN pnpm install --filter @smtp-oauth2/web... --config.child-concurrency=2 --config.network-concurrency=2
 
 COPY . .
 
