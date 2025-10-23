@@ -1,5 +1,10 @@
-import { SMTPServer } from 'smtp-server';
-import { simpleParser } from 'mailparser';
+import {
+  SMTPServer,
+  type SMTPServerAuthentication,
+  type SMTPServerAuthenticationResponse,
+  type SMTPServerSession
+} from 'smtp-server';
+import { simpleParser, type ParsedMail } from 'mailparser';
 import { Queue } from 'bullmq';
 import Redis from 'ioredis';
 import pino from 'pino';
@@ -13,16 +18,20 @@ const queue = new Queue('outbound', { connection: redis });
 const server = new SMTPServer({
   authOptional: false,
   disabledCommands: ['STARTTLS'],
-  onAuth(auth, session, callback) {
+  onAuth(
+    auth: SMTPServerAuthentication,
+    session: SMTPServerSession,
+    callback: (err: Error | null, response?: SMTPServerAuthenticationResponse) => void
+  ) {
     if (!process.env.SMTP_ACCEPT_ALL) {
       return callback(new Error('Auth non implémentée'));
     }
     logger.info({ username: auth.username }, 'auth accepté (mode démo)');
     callback(null, { user: { username: auth.username } });
   },
-  async onData(stream, session, callback) {
+  async onData(stream: NodeJS.ReadableStream, session: SMTPServerSession, callback: (err?: Error | null) => void) {
     try {
-      const parsed = await simpleParser(stream);
+      const parsed: ParsedMail = await simpleParser(stream);
       await queue.add('deliver', {
         envelope: session.envelope,
         subject: parsed.subject,
