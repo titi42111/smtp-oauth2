@@ -11,7 +11,7 @@
     "bullmq": "4.13.1",
     "dotenv": "16.4.5",
     "ioredis": "5.4.1",
-    "mailparser": "3.9.0",
+    "mailparser": "3.7.5",
     "pino": "9.1.0",
     "smtp-server": "3.13.3"
   },

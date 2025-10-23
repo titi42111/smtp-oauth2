@@ -82,7 +82,7 @@ Un fichier [`docker-compose.yml`](./docker-compose.yml) est fourni pour un dépl
 - `api`, `smtp`, `worker`, `web` (images construites via leurs Dockerfiles respectifs)
 - `traefik` (reverse proxy TLS, ports 80/443)
 
-Variables d'environnement : voir [`.env.example`](./.env.example). Les secrets (`MASTER_KEY`, `JWT_SECRET`, `AZURE_*`, `TLS_*`) doivent être fournis par le client (idéalement via Docker secrets). STARTTLS et le chaînage de certificats internes seront intégrés dans les prochaines itérations.
+Variables d'environnement : voir [`.env.example`](./.env.example). Les secrets (`MASTER_KEY`, `JWT_SECRET`, `AZURE_*`, `TLS_*`) seront initialisés depuis l'interface d'administration (fonctionnalité en cours) : il n'est donc plus nécessaire de préparer des Docker secrets au démarrage. STARTTLS et le chaînage de certificats internes seront intégrés dans les prochaines itérations.
 
 Commande type :
 
@@ -123,7 +123,7 @@ Pour connecter l'application au tenant Azure AD du client :
 1. Créer une application Azure AD (single-tenant) avec les autorisations **Mail.Send** (Application et/ou Delegated).
 2. Récupérer `AZURE_CLIENT_ID`, `AZURE_CLIENT_SECRET`, `AZURE_TENANT_ID`. L'autorité recommandée est `https://login.microsoftonline.com/<tenantId>`.
 3. Définir les scopes `GRAPH_SCOPES` selon le mode souhaité (`https://graph.microsoft.com/.default` couvre Application ; ajouter `Mail.Send` pour Delegated).
-4. Renseigner ces valeurs dans `.env`/Docker secrets. Le worker BullMQ consommera ces paramètres pour appeler Microsoft Graph (implémentation à compléter).
+4. Renseigner ces valeurs via l'interface d'administration (planifiée) ou, à défaut, dans un `.env` local pour le développement. Le worker BullMQ consommera ces paramètres pour appeler Microsoft Graph (implémentation à compléter).
 
 ## Observabilité & sécurité
 
@@ -131,18 +131,19 @@ Pour connecter l'application au tenant Azure AD du client :
 - **Prometheus** : endpoint `/api/metrics` exposant les métriques par défaut via `prom-client`.
 - **Healthchecks** : `/healthz` et `/readyz` (Terminus).
 - **Sécurité HTTP** : Helmet, CSRF (cookie), JSON Web Tokens, placeholders pour RBAC/MFA.
-- **Journalisation** : Pino (JSON). Les messages SMTP ne sont pas stockés dans les logs (métadonnées uniquement).
+- **Journalisation** : Pino (JSON). Les messages SMTP ne sont pas stockés dans les logs (métadonnées uniquement) et une vue dédiée exposera les envois/réceptions/échecs dans l'interface web.
 
 ## Roadmap fonctionnelle
 
 Cette base technique pose les jalons suivants pour les itérations à venir :
 
-- Implémentation complète des flux Auth (MFA TOTP, refresh tokens, Azure AD SSO optionnel).
+- Implémentation complète des flux Auth (MFA TOTP, refresh tokens, SSO Microsoft 365 pour l'interface d'administration et la gestion des connecteurs).
 - Gestion CRUD avancée des connecteurs entrants/sortants + tests de connectivité.
 - Orchestration BullMQ (retry/backoff, rate limit, monitoring) et conversion MIME → Graph.
 - StartTLS obligatoire côté serveur SMTP avec prise en charge d'une autorité interne.
 - Interface Next.js : tableaux de bord, simulateur complet, mode air-gap, localisation FR/EN.
 - Observabilité enrichie : OpenTelemetry, streaming logs SSE, dashboards Prometheus.
+- Gestion centralisée des journaux d'envoi/réception/échec (vue UI + export).
 - Scripts de sauvegarde/restauration chiffrés, politiques de rotation des secrets.
 - Documentation on-premise détaillée (procédures d'upgrade, scénarios proxy, air-gap, exemples swaks/k6).
 
