@@ -5,7 +5,12 @@ WORKDIR /app
 COPY package.json pnpm-workspace.yaml turbo.json tsconfig.base.json ./
 COPY apps/web/package.json apps/web/
 
-RUN pnpm install --filter @smtp-oauth2/web... --config.child-concurrency=2 --config.network-concurrency=2
+RUN pnpm install \
+  --filter @smtp-oauth2/web... \
+  --config.child-concurrency=2 \
+  --config.network-concurrency=2 \
+  --config.workspace-concurrency=1 \
+  --config.max-store-concurrency=2
 
 COPY . .
 
