@@ -77,12 +77,15 @@ Le fichier `pnpm-workspace.yaml` expose les workspaces `apps/*` et `packages/*`.
 
 Un fichier [`docker-compose.yml`](./docker-compose.yml) est fourni pour un déploiement rapide on-prem :
 
+- `certs` (job éphémère : génère un certificat auto-signé si les fichiers attendus sont absents)
 - `postgres` (volume `postgres-data`)
 - `redis`
 - `api`, `smtp`, `worker`, `web` (images construites via leurs Dockerfiles respectifs)
 - `traefik` (reverse proxy TLS, ports 80/443)
 
-Variables d'environnement : voir [`.env.example`](./.env.example). Les secrets (`MASTER_KEY`, `JWT_SECRET`, `AZURE_*`, `TLS_*`) seront initialisés depuis l'interface d'administration (fonctionnalité en cours) : il n'est donc plus nécessaire de préparer des Docker secrets au démarrage. STARTTLS et le chaînage de certificats internes seront intégrés dans les prochaines itérations.
+Variables d'environnement : voir [`.env.example`](./.env.example). Les secrets (`MASTER_KEY`, `JWT_SECRET`, `AZURE_*`, `TLS_*`) seront initialisés depuis l'interface d'administration (fonctionnalité en cours) : il n'est donc plus nécessaire de préparer des Docker secrets au démarrage.
+
+Le service `certs` monte le volume partagé `traefik-certs` et invoque `openssl` pour produire `server.crt`/`server.key` (ainsi qu'un `ca.pem` identique) lorsque les fichiers sont absents. Ajustez `TLS_SELF_SIGNED_SUBJECT` et `TLS_SELF_SIGNED_DAYS` pour personnaliser le certificat, ou prémontez vos propres fichiers afin que Traefik et les services SMTP/API les réutilisent.
 
 Commande type :
 
@@ -129,7 +132,7 @@ Pour connecter l'application au tenant Azure AD du client :
 
 - **Swagger/OpenAPI** : disponible via `/docs` sur l'API NestJS.
 - **Prometheus** : endpoint `/api/metrics` exposant les métriques par défaut via `prom-client`.
-- **Healthchecks** : `/healthz` et `/readyz` (Terminus).
+- **Healthchecks** : `/healthz` et `/readyz` vérifient l'accès à PostgreSQL et exposent un horodatage ISO.
 - **Sécurité HTTP** : Helmet, CSRF (cookie), JSON Web Tokens, placeholders pour RBAC/MFA.
 - **Journalisation** : Pino (JSON). Les messages SMTP ne sont pas stockés dans les logs (métadonnées uniquement) et une vue dédiée exposera les envois/réceptions/échecs dans l'interface web.
 
