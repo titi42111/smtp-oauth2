@@ -1,0 +1,130 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  OPERATOR
+  VIEWER
+}
+
+enum AuthMode {
+  LOCAL_USERS
+  CONNECTOR_CREDENTIAL
+}
+
+enum GraphMode {
+  APPLICATION
+  DELEGATED
+}
+
+enum MessageStatus {
+  QUEUED
+  SENT
+  FAILED
+}
+
+model Setting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  valueJson Json
+  encrypted Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  passwordHash String
+  role         UserRole
+  mfaSecret    String?
+  enabled      Boolean   @default(true)
+  lastLoginAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  auditLogs    AuditLog[]
+}
+
+model InboundConnector {
+  id                    String   @id @default(cuid())
+  name                  String
+  listenHost            String
+  listenPort            Int      @default(587)
+  requireStartTLS       Boolean  @default(true)
+  authMode              AuthMode
+  connectorUser         String?
+  connectorPassHash     String?
+  allowedSenderDomains  String[] @default([])
+  enabled               Boolean  @default(true)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  messages              Message[]
+}
+
+model OutboundConnector {
+  id                       String      @id @default(cuid())
+  name                     String
+  graphMode                GraphMode
+  azureTenantId            String
+  clientId                 String
+  clientSecret             String
+  authority                String
+  defaultFromAddress       String?
+  sendAsUserId             String?
+  mailboxUserPrincipalName String?
+  scopes                   String[]    @default([])
+  tokenCache               Json?
+  enabled                  Boolean     @default(true)
+  rateLimitPerMin          Int?
+  createdAt                DateTime    @default(now())
+  updatedAt                DateTime    @updatedAt
+  routingRules             RoutingRule[]
+  messages                 Message[]
+}
+
+model RoutingRule {
+  id                   String             @id @default(cuid())
+  name                 String
+  matchSenderRegex     String?
+  matchRecipientRegex  String?
+  forceFromAddress     String?
+  outboundConnectorId  String
+  enabled              Boolean            @default(true)
+  priority             Int
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+  outboundConnector    OutboundConnector  @relation(fields: [outboundConnectorId], references: [id], onDelete: Cascade)
+}
+
+model Message {
+  id                  String            @id @default(cuid())
+  inboundConnectorId  String?
+  outboundConnectorId String?
+  envelopeFrom        String
+  envelopeTo          String[]          @default([])
+  subject             String?
+  status              MessageStatus     @default(QUEUED)
+  attempts            Int               @default(0)
+  lastError           String?
+  queuedAt            DateTime          @default(now())
+  sentAt              DateTime?
+  inboundConnector    InboundConnector? @relation(fields: [inboundConnectorId], references: [id], onDelete: SetNull)
+  outboundConnector   OutboundConnector? @relation(fields: [outboundConnectorId], references: [id], onDelete: SetNull)
+}
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  actorUserId String?
+  action      String
+  targetType  String
+  targetId    String?
+  detailsJson Json?
+  createdAt   DateTime @default(now())
+  actor       User?    @relation(fields: [actorUserId], references: [id])
+}

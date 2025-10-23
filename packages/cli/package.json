@@ -1,0 +1,21 @@
+{
+  "name": "@smtp-oauth2/cli",
+  "private": true,
+  "version": "0.1.0",
+  "bin": {
+    "smtp-oauth2": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsx watch src/index.ts"
+  },
+  "dependencies": {
+    "commander": "12.0.0",
+    "dotenv": "16.4.5",
+    "zod": "3.22.4"
+  },
+  "devDependencies": {
+    "tsx": "4.7.1",
+    "typescript": "5.4.2"
+  }
+}
