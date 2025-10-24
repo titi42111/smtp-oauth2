@@ -1,28 +1,12 @@
 services:
   certs:
     image: alpine:3.19
-    entrypoint: ["/bin/sh", "-c"]
-    command: >-
-      set -eu
-      set -o pipefail 2>/dev/null || true
-      apk add --no-cache openssl >/dev/null
-      CERT_PATH="$${TLS_CERT_FILE:-/certs/server.crt}"
-      KEY_PATH="$${TLS_KEY_FILE:-/certs/server.key}"
-      CA_PATH="$${CA_BUNDLE:-/certs/ca.pem}"
-      SUBJECT="$${TLS_SELF_SIGNED_SUBJECT:-/CN=smtp-oauth2.local}"
-      DAYS="$${TLS_SELF_SIGNED_DAYS:-365}"
-      CERT_DIR=$$(dirname "$$CERT_PATH")
-      KEY_DIR=$$(dirname "$$KEY_PATH")
-      CA_DIR=$$(dirname "$$CA_PATH")
-      mkdir -p "$$CERT_DIR" "$$KEY_DIR" "$$CA_DIR"
-      if [ ! -s "$$CERT_PATH" ] || [ ! -s "$$KEY_PATH" ]; then
-        openssl req -x509 -nodes -newkey rsa:4096 -keyout "$$KEY_PATH" -out "$$CERT_PATH" -days "$$DAYS" -subj "$$SUBJECT"
-      fi
-      if [ ! -s "$$CA_PATH" ]; then
-        cp "$$CERT_PATH" "$$CA_PATH"
-      fi
+    entrypoint: ["/bin/sh", "/scripts/bootstrap.sh"]
+    env_file:
+      - .env.example
     volumes:
       - traefik-certs:/certs
+      - ./docker/certs:/scripts:ro
 
   postgres:
     image: postgres:16-alpine

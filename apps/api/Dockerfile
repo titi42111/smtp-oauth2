@@ -1,5 +1,6 @@
 FROM node:20-alpine
-RUN corepack enable
+RUN apk add --no-cache openssl1.1-compat \
+    && corepack enable
 WORKDIR /app
 
 COPY package.json turbo.json tsconfig.base.json ./
