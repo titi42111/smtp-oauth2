@@ -1,5 +1,7 @@
-FROM node:20-alpine
-RUN apk add --no-cache openssl1.1-compat \
+FROM node:20-bullseye
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends libssl1.1 openssl ca-certificates \
+    && rm -rf /var/lib/apt/lists/* \
     && corepack enable
 WORKDIR /app
 
