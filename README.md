@@ -87,7 +87,7 @@ Variables d'environnement : voir [`.env.example`](./.env.example). Les secrets (
 
 Le service `certs` monte le volume partagé `traefik-certs` et invoque `openssl` pour produire `server.crt`/`server.key` (ainsi qu'un `ca.pem` identique) lorsque les fichiers sont absents. Ajustez `TLS_SELF_SIGNED_SUBJECT` et `TLS_SELF_SIGNED_DAYS` pour personnaliser le certificat, ou prémontez vos propres fichiers afin que Traefik et les services SMTP/API les réutilisent.
 
-Les Dockerfiles des services Node.js exécutent `pnpm install` avec une concurrence réduite (`--config.workspace-concurrency=1`, `--config.child-concurrency=2`) afin d'éviter les dépassements mémoire lors de la construction sur des hôtes limités. Vous pouvez augmenter ces valeurs si votre environnement dispose de ressources plus confortables.
+Les Dockerfiles des services Node.js exécutent `pnpm install` avec une concurrence réduite (`--workspace-concurrency 1`, `--child-concurrency 1`, `--network-concurrency 1`, `--max-store-concurrency 1`) afin d'éviter les dépassements mémoire lors de la construction sur des hôtes limités. Vous pouvez augmenter ces valeurs si votre environnement dispose de ressources plus confortables.
 
 Commande type :
 

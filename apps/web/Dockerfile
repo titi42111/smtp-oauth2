@@ -8,10 +8,10 @@ COPY apps/web/package.json apps/web/
 
 RUN pnpm install \
   --filter @smtp-oauth2/web... \
-  --config.child-concurrency=1 \
-  --config.network-concurrency=1 \
-  --config.workspace-concurrency=1 \
-  --config.max-store-concurrency=1
+  --child-concurrency 1 \
+  --network-concurrency 1 \
+  --workspace-concurrency 1 \
+  --max-store-concurrency 1
 
 COPY . .
 

@@ -10,10 +10,10 @@ COPY packages/prisma/package.json packages/prisma/
 RUN PRISMA_SKIP_GENERATE=1 pnpm install \
   --filter @smtp-oauth2/api... \
   --filter @smtp-oauth2/prisma... \
-  --config.child-concurrency=1 \
-  --config.network-concurrency=1 \
-  --config.workspace-concurrency=1 \
-  --config.max-store-concurrency=1
+  --child-concurrency 1 \
+  --network-concurrency 1 \
+  --workspace-concurrency 1 \
+  --max-store-concurrency 1
 
 COPY . .
 
