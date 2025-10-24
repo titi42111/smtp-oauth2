@@ -7,13 +7,14 @@ COPY docker/workspaces/api.yaml pnpm-workspace.yaml
 COPY apps/api/package.json apps/api/
 COPY packages/prisma/package.json packages/prisma/
 
+ENV PNPM_WORKSPACE_CONCURRENCY=1 \
+    PNPM_STORE_CONCURRENCY=1
+
 RUN PRISMA_SKIP_GENERATE=1 pnpm install \
   --filter @smtp-oauth2/api... \
   --filter @smtp-oauth2/prisma... \
   --child-concurrency 1 \
-  --network-concurrency 1 \
-  --workspace-concurrency 1 \
-  --max-store-concurrency 1
+  --network-concurrency 1
 
 COPY . .
 

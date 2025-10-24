@@ -6,12 +6,13 @@ COPY package.json turbo.json tsconfig.base.json ./
 COPY docker/workspaces/worker.yaml pnpm-workspace.yaml
 COPY apps/worker/package.json apps/worker/
 
+ENV PNPM_WORKSPACE_CONCURRENCY=1 \
+    PNPM_STORE_CONCURRENCY=1
+
 RUN pnpm install \
   --filter @smtp-oauth2/worker... \
   --child-concurrency 1 \
-  --network-concurrency 1 \
-  --workspace-concurrency 1 \
-  --max-store-concurrency 1
+  --network-concurrency 1
 
 COPY . .
 
