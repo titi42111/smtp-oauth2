@@ -2,15 +2,16 @@ FROM node:20-alpine
 RUN corepack enable
 WORKDIR /app
 
-COPY package.json pnpm-workspace.yaml turbo.json tsconfig.base.json ./
+COPY package.json turbo.json tsconfig.base.json ./
+COPY docker/workspaces/smtp.yaml pnpm-workspace.yaml
 COPY apps/smtp/package.json apps/smtp/
 
 RUN pnpm install \
   --filter @smtp-oauth2/smtp... \
-  --config.child-concurrency=2 \
-  --config.network-concurrency=2 \
+  --config.child-concurrency=1 \
+  --config.network-concurrency=1 \
   --config.workspace-concurrency=1 \
-  --config.max-store-concurrency=2
+  --config.max-store-concurrency=1
 
 COPY . .
 
