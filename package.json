@@ -1,0 +1,18 @@
+{
+  "name": "smtp-oauth2",
+  "private": true,
+  "version": "0.1.0",
+  "packageManager": "pnpm@8.15.4",
+  "scripts": {
+    "dev": "turbo run dev --parallel --no-cache",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "@types/node": "20.11.30",
+    "prettier": "3.2.5",
+    "turbo": "1.13.3"
+  }
+}

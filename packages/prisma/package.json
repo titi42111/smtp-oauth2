@@ -1,0 +1,21 @@
+{
+  "name": "@smtp-oauth2/prisma",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "generate": "prisma generate",
+    "migrate:dev": "prisma migrate dev",
+    "migrate:deploy": "prisma migrate deploy",
+    "seed": "ts-node prisma/seed.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "5.12.1",
+    "bcryptjs": "2.4.3",
+    "zod": "3.22.4"
+  },
+  "devDependencies": {
+    "prisma": "5.12.1",
+    "ts-node": "10.9.2",
+    "typescript": "5.4.2"
+  }
+}

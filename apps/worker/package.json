@@ -1,0 +1,23 @@
+{
+  "name": "@smtp-oauth2/worker",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
+    "build": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@azure/msal-node": "2.9.2",
+    "bullmq": "4.13.1",
+    "dotenv": "16.4.5",
+    "ioredis": "5.4.1",
+    "mailparser": "3.7.5",
+    "node-fetch": "3.3.2",
+    "pino": "9.1.0"
+  },
+  "devDependencies": {
+    "tsx": "4.7.1",
+    "typescript": "5.4.2"
+  }
+}
